@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sports Athlete Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+        }
+
+        .logo {
+            margin-bottom: 2rem;
+        }
+
+        .logo h1 {
+            font-size: 3rem;
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .logo p {
+            font-size: 1.2rem;
+            color: #666;
+            font-weight: 300;
+        }
+
+        .selection-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .user-type-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 2rem;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .user-type-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            border-color: #667eea;
+        }
+
+        .user-type-card.athlete:hover {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        }
+
+        .user-type-card.coach:hover {
+            background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+        }
+
+        .user-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .user-type-card h3 {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .user-type-card p {
+            color: #666;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .features {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 2px solid #e9ecef;
+        }
+
+        .features h3 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .feature-item {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 2rem;
+                margin: 1rem;
+            }
+
+            .logo h1 {
+                font-size: 2.5rem;
+            }
+
+            .selection-container {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .user-type-card {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <h1>🏆 Sports Platform</h1>
+            <p>Connect Athletes with Coaches</p>
+        </div>
+
+        <div class="selection-container">
+            <a href="/athlete/login" class="user-type-card athlete">
+                <div class="user-icon">🏃‍♂️</div>
+                <h3>Athlete</h3>
+                <p>Join as an athlete to track your progress, connect with coaches, and showcase your skills in various sports categories.</p>
+            </a>
+
+            <a href="/coach/login" class="user-type-card coach">
+                <div class="user-icon">👨‍🏫</div>
+                <h3>Coach</h3>
+                <p>Join as a coach to mentor athletes, share your expertise, and help develop the next generation of sports stars.</p>
+            </a>
+        </div>
+
+        <div class="features">
+            <h3>Platform Features</h3>
+            <div class="feature-grid">
+                <div class="feature-item">📊 Progress Tracking</div>
+                <div class="feature-item">🏅 Level Management</div>
+                <div class="feature-item">📱 Mobile Friendly</div>
+                <div class="feature-item">🔒 Secure Profiles</div>
+                <div class="feature-item">📈 Performance Analytics</div>
+                <div class="feature-item">🤝 Coach Matching</div>
+            </div>
+        </div>
+
+        <div class="back-link" style="text-align: center; margin-top: 2rem;">
+            <a href="/" style="color: #666; text-decoration: none; font-size: 0.9rem;">← Back to Logo</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,199 +1,199 @@
-# EthBond - AI-Powered Pose Scoring System
+# 🏆 AthBond - AI-Powered Sports Platform
 
-EthBond is a comprehensive machine learning system for real-time pose analysis and scoring using computer vision, pose detection, and deep learning.
+A comprehensive sports management system that combines AI-powered pose analysis with athlete-coach collaboration, built using both Python ML pipeline and Node.js web platform.
 
-## 🚀 Features
+## 🌟 Features
 
+### **🤖 AI-Powered Pose Analysis (Python Backend)**
 - **Real-time Pose Detection**: Using MediaPipe for accurate pose landmark extraction
 - **Advanced ML Models**: TensorFlow-based models for pose scoring and classification
 - **Intuitive Scoring System**: 0-100 point scale with color-coded performance levels
-- **Comprehensive Evaluation**: Detailed metrics including accuracy, precision, recall, and confusion matrices
+- **Rep Counting**: Automatic rep detection (180° → 0° → 180°) with state machine logic
 - **Video Processing**: OpenCV-based video capture and frame preprocessing
+- **Comprehensive Evaluation**: Detailed metrics including accuracy, precision, recall, and confusion matrices
 - **Modular Architecture**: Clean, well-documented codebase with separate modules for each component
+
+### **👥 Sports Management Platform (Node.js Frontend)**
+- **For Athletes:**
+  - 🏃‍♂️ **Athlete Registration** - Complete profile with sports category and competition level
+  - 📊 **Profile Management** - Update personal information and sports details
+  - 🏅 **Level Tracking** - District, State, and National level management
+  - 📱 **Responsive Dashboard** - Modern, mobile-friendly interface
+
+- **For Coaches:**
+  - 👨‍🏫 **Coach Registration** - Professional coach profiles with government ID verification
+  - 🎯 **Sports Expertise** - Specialized coaching in various sports categories
+  - 📈 **Athlete Management** - Track and mentor athletes
+  - 🔒 **Verified Credentials** - Government-issued sports ID validation
+
+### **Platform Features:**
+- 🔐 **Secure Authentication** - Separate login systems for athletes and coaches
+- 🛡️ **Password Security** - Bcrypt hashing for password protection
+- 📱 **Responsive Design** - Works seamlessly on desktop and mobile
+- ⚡ **Real-time Validation** - Client and server-side form validation
+- 🎨 **Modern UI/UX** - Beautiful gradient designs with smooth animations
+
+## 🚀 Quick Start
+
+### Prerequisites
+- **Python 3.8+** (for ML pipeline)
+- **Node.js v14+** (for web platform)
+- **npm** (Node Package Manager)
+
+### Installation
+
+#### 1. **Python ML Pipeline Setup:**
+```bash
+# Clone the repository
+git clone https://github.com/PseudoCoder16/AthBond.git
+cd AthBond
+
+# Create virtual environment
+python -m venv version
+.\version\Scripts\Activate.ps1  # Windows
+# source version/bin/activate    # Linux/Mac
+
+# Install Python dependencies
+pip install -r requirements.txt
+
+# Run the ML pipeline
+python main.py --mode infer
+```
+
+#### 2. **Node.js Web Platform Setup:**
+```bash
+# Install Node.js dependencies
+npm install
+
+# Start the web server
+npm start
+# or
+node server.js
+```
 
 ## 📁 Project Structure
 
 ```
-athbond/
-├── version/                    # Virtual environment (ignore)
-├── data/                      # Dataset storage (CSV, JSON)
-├── models/                    # Saved ML/TensorFlow models
-├── main.py                    # Main entry point (runs whole pipeline)
-├── opencv_utils.py            # Video capture & frame preprocessing
-├── mediapipe_utils.py         # Pose detection & keypoint extraction
-├── ml_eval.py                 # Evaluation metrics (accuracy, precision, recall, confusion matrix)
-├── tensorflow_model.py        # Builds & trains TF model for scoring
-├── test_setup.py              # Quick test suite
-├── requirements.txt           # Project dependencies
-└── README.md                  # This file
+AthBond/
+├── 🤖 Python ML Pipeline
+│   ├── main.py                 # Main application entry point
+│   ├── tensorflow_model.py     # ML model and rep counting
+│   ├── mediapipe_utils.py      # Pose detection utilities
+│   ├── opencv_utils.py         # Video processing utilities
+│   ├── ml_eval.py             # Model evaluation metrics
+│   ├── video_analyzer.py      # Video upload and analysis
+│   ├── user_manager.py        # User data management
+│   ├── api_server.py          # Flask REST API
+│   └── requirements.txt       # Python dependencies
+│
+├── 🌐 Node.js Web Platform
+│   ├── server.js              # Main server file
+│   ├── package.json           # Node.js dependencies
+│   ├── src/                   # Source code
+│   │   ├── controllers/       # Route controllers
+│   │   ├── models/           # Database models
+│   │   ├── routes/           # API routes
+│   │   └── services/         # Business logic
+│   └── public/               # Frontend files
+│       ├── athlete/          # Athlete pages
+│       └── coach/            # Coach pages
+│
+└── 📊 Data Storage
+    ├── data/                 # Training data (ignored by Git)
+    ├── models/              # ML models (ignored by Git)
+    ├── uploads/             # Video uploads (ignored by Git)
+    ├── user_data/           # User analytics (ignored by Git)
+    └── results/             # Analysis results (ignored by Git)
 ```
-
-## 🛠️ Installation
-
-1. **Clone the repository**:
-   ```bash
-   git clone <repository-url>
-   cd athbond
-   ```
-
-2. **Activate virtual environment**:
-   ```bash
-   # Windows
-   .\version\Scripts\Activate.ps1
-   
-   # Linux/Mac
-   source version/bin/activate
-   ```
-
-3. **Install dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
 
 ## 🎯 Usage
 
-### Quick Test
+### **Real-time Pose Analysis:**
 ```bash
-python test_setup.py --quick
+# Activate virtual environment
+.\version\Scripts\Activate.ps1
+
+# Run real-time pose detection
+python main.py --mode infer
+
+# Run video analysis
+python main.py --mode analyze --video path/to/video.mp4
+
+# Train new model
+python main.py --mode train --data data/training/
 ```
 
-### Full Test Suite
+### **Web Platform:**
 ```bash
-python test_setup.py
+# Start the web server
+npm start
+
+# Access the platform
+# Athletes: http://localhost:3000/athlete
+# Coaches: http://localhost:3000/coach
 ```
 
-### Training Mode
+### **API Endpoints:**
 ```bash
-python main.py --mode train --data-path data/training/
+# Start Flask API server
+python start_server.py
+
+# Upload video for analysis
+curl -X POST -F "file=@video.mp4" http://localhost:5000/api/upload
+
+# Get user progress
+curl http://localhost:5000/api/user/{user_id}/progress
 ```
-
-### Inference Mode (Real-time)
-```bash
-python main.py --mode infer --video-source 0
-```
-
-### Evaluation Mode
-```bash
-python main.py --mode eval --model-path models/ethbond_model.h5
-```
-
-## 📊 Components
-
-### 1. OpenCV Utils (`opencv_utils.py`)
-- Video capture and frame preprocessing
-- Image enhancement and filtering
-- Video I/O operations
-- Frame saving and loading utilities
-
-### 2. MediaPipe Utils (`mediapipe_utils.py`)
-- Pose detection using MediaPipe
-- Keypoint extraction and normalization
-- Pose analysis and stability metrics
-- Landmark visualization
-
-### 3. TensorFlow Model (`tensorflow_model.py`)
-- Multiple model architectures (Dense, CNN, LSTM, Transformer)
-- Model training with advanced callbacks
-- Real-time pose scoring
-- Model explanation and confidence analysis
-
-### 4. ML Evaluation (`ml_eval.py`)
-- Comprehensive evaluation metrics
-- Visualization tools (confusion matrix, ROC curves, learning curves)
-- HTML report generation
-- Cross-validation and learning curve analysis
-
-### 5. Main Pipeline (`main.py`)
-- Orchestrates the entire workflow
-- Training and inference pipelines
-- Real-time video processing
-- Command-line interface
 
 ## 🔧 Configuration
 
-The system uses a default configuration that can be customized:
+### **Environment Variables:**
+Create `.env` file:
+```env
+# Database
+MONGODB_URI=mongodb://localhost:27017/athbond
+SESSION_SECRET=your-secret-key
 
-```python
-config = {
-    'video_source': 0,  # Default webcam
-    'model_path': 'models/ethbond_model.h5',
-    'data_path': 'data/',
-    'batch_size': 32,
-    'epochs': 100,
-    'learning_rate': 0.001,
-    'input_shape': (33, 4),  # MediaPipe pose landmarks
-    'num_classes': 10,  # Adjust based on your scoring system
-    'confidence_threshold': 0.5
-}
+# ML Pipeline
+MODEL_PATH=models/best_model.h5
+UPLOAD_DIR=uploads/
+RESULTS_DIR=results/
 ```
 
-## 📈 Model Architectures
+## 📊 ML Pipeline Details
 
-The system supports multiple model architectures:
+### **Scoring System:**
+- **Angle < 90°**: Score 80-100 (Excellent form)
+- **Angle ≥ 90°**: Score 0-20 (Needs improvement)
+- **Rep Counting**: Tracks complete movement cycles (180° → 0° → 180°)
 
-1. **Dense Neural Network**: Standard fully connected layers
-2. **CNN**: Convolutional layers for spatial feature extraction
-3. **LSTM**: Recurrent layers for temporal sequence analysis
-4. **Transformer**: Attention-based architecture for complex patterns
-
-## 🧪 Testing
-
-Run the comprehensive test suite:
-
-```bash
-# Test all components
-python test_setup.py
-
-# Test specific component
-python test_setup.py --component opencv_utils
-
-# Quick functionality test
-python test_setup.py --quick
-```
-
-## 📝 Dependencies
-
-- **TensorFlow 2.13.0**: Deep learning framework
-- **OpenCV 4.12.0**: Computer vision library
-- **MediaPipe 0.10.9**: Pose detection
-- **scikit-learn 1.7.2**: Machine learning utilities
-- **NumPy 1.24.3**: Numerical computing
-- **Matplotlib 3.10.6**: Visualization
-- **Pandas**: Data manipulation
+### **Model Architecture:**
+- **Input**: 33 MediaPipe pose landmarks (4D coordinates)
+- **Output**: Pose score (0-100) and rep count
+- **Framework**: TensorFlow/Keras with custom loss functions
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Run tests: `python test_setup.py`
-5. Submit a pull request
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-## 📄 License
+## 📝 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 👥 Team
+
+- **PseudoCoder16** - Lead Developer
+- **AI/ML Team** - Pose analysis and scoring algorithms
+- **Frontend Team** - Web platform and user interface
 
 ## 🆘 Support
 
-For support and questions:
-- Create an issue in the repository
-- Check the test suite for examples
-- Review the comprehensive documentation in each module
-
-## 🎉 Getting Started
-
-1. **Run the quick test** to verify everything is working:
-   ```bash
-   python test_setup.py --quick
-   ```
-
-2. **Try the inference mode** with your webcam:
-   ```bash
-   python main.py --mode infer
-   ```
-
-3. **Explore the code** - each module is well-documented with examples and test functions.
+For support, email support@athbond.com or create an issue in the repository.
 
 ---
 
-**EthBond** - Empowering pose analysis with AI! 🚀
+**Built with ❤️ for athletes and coaches worldwide**
