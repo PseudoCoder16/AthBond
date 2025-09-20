@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coach Home - AuthBond</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        .header {
+            background: white;
+            padding: 1rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .profile-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .container {
+            padding: 1rem;
+        }
+
+        .welcome-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        .welcome-title {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .welcome-subtitle {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .section {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            color: #333;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .athletes-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .athlete-item {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.2s ease;
+        }
+
+        .athlete-item:hover {
+            transform: translateX(5px);
+        }
+
+        .athlete-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .athlete-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.25rem;
+        }
+
+        .athlete-sport {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .athlete-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .alerts-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-weight: 500;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            color: #856404;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            color: #721c24;
+        }
+
+        .alert-icon {
+            font-size: 1.5rem;
+        }
+
+        .alert-content {
+            flex: 1;
+        }
+
+        .alert-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .alert-description {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .alert-action {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .alert-action:hover {
+            background: #5a6fd8;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 1rem 0;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            text-decoration: none;
+            color: #666;
+            transition: color 0.2s ease;
+        }
+
+        .nav-item.active {
+            color: #667eea;
+        }
+
+        .nav-item:hover {
+            color: #667eea;
+        }
+
+        .nav-icon {
+            font-size: 1.5rem;
+        }
+
+        .nav-label {
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #666;
+            padding: 2rem;
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0.5rem;
+            }
+            
+            .section {
+                padding: 1rem;
+            }
+            
+            .athlete-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">👨‍🏫 Coach</div>
+        <div class="profile-icon" id="profileIcon">C</div>
+    </header>
+
+    <div class="container">
+        <div class="welcome-card">
+            <h1 class="welcome-title" id="welcomeTitle">Welcome back!</h1>
+            <p class="welcome-subtitle" id="welcomeSubtitle">Monitor your athletes' performance</p>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">👥 Athletes</h2>
+            <div class="athletes-list" id="athletesList">
+                <div class="empty-state">
+                    <div class="empty-icon">👥</div>
+                    <div>No athletes assigned yet</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">🚨 Alerts</h2>
+            <div class="alerts-container" id="alertsContainer">
+                <div class="alert alert-warning">
+                    <div class="alert-icon">⚠️</div>
+                    <div class="alert-content">
+                        <div class="alert-title">Form quality < 70%</div>
+                        <div class="alert-description">Athlete John Doe's recent video shows poor form</div>
+                    </div>
+                    <button class="alert-action">Review</button>
+                </div>
+                <div class="alert alert-danger">
+                    <div class="alert-icon">🚨</div>
+                    <div class="alert-content">
+                        <div class="alert-title">Possible injury risk</div>
+                        <div class="alert-description">Unusual movement patterns detected in Sarah's video</div>
+                    </div>
+                    <button class="alert-action">Investigate</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">📊 Overview</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number" id="totalAthletes">0</div>
+                    <div class="stat-label">Total Athletes</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="activeAlerts">2</div>
+                    <div class="stat-label">Active Alerts</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="videosAnalyzed">0</div>
+                    <div class="stat-label">Videos Analyzed</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="/coach/home" class="nav-item active">
+            <div class="nav-icon">🏠</div>
+            <div class="nav-label">Home</div>
+        </a>
+        <a href="/coach/dashboard" class="nav-item">
+            <div class="nav-icon">📊</div>
+            <div class="nav-label">Dashboard</div>
+        </a>
+        <a href="/coach/leaderboard" class="nav-item">
+            <div class="nav-icon">🏆</div>
+            <div class="nav-label">Leaderboard</div>
+        </a>
+    </nav>
+
+    <script>
+        // Load coach data
+        async function loadCoachData() {
+            try {
+                const response = await fetch('/api/coach');
+                const result = await response.json();
+
+                if (result.success) {
+                    const coach = result.coach;
+                    document.getElementById('welcomeTitle').textContent = `Welcome back, ${coach.name}!`;
+                    document.getElementById('welcomeSubtitle').textContent = `Monitor your ${coach.sports} athletes' performance`;
+                    document.getElementById('profileIcon').textContent = coach.name.charAt(0).toUpperCase();
+                }
+            } catch (error) {
+                console.error('Error loading coach data:', error);
+            }
+        }
+
+        // Load athletes data
+        async function loadAthletes() {
+            try {
+                const response = await fetch('/api/coach/athletes');
+                const result = await response.json();
+
+                if (result.success && result.athletes.length > 0) {
+                    const athletesList = document.getElementById('athletesList');
+                    athletesList.innerHTML = result.athletes.map(athlete => `
+                        <div class="athlete-item">
+                            <div class="athlete-info">
+                                <div class="athlete-name">${athlete.name}</div>
+                                <div class="athlete-sport">${athlete.sports} - ${athlete.level}</div>
+                            </div>
+                            <div class="athlete-status status-active">Active</div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading athletes:', error);
+            }
+        }
+
+        // Load alerts
+        async function loadAlerts() {
+            try {
+                const response = await fetch('/api/coach/alerts');
+                const result = await response.json();
+
+                if (result.success) {
+                    const alertsContainer = document.getElementById('alertsContainer');
+                    if (result.alerts.length > 0) {
+                        alertsContainer.innerHTML = result.alerts.map(alert => `
+                            <div class="alert ${alert.type === 'warning' ? 'alert-warning' : 'alert-danger'}">
+                                <div class="alert-icon">${alert.icon}</div>
+                                <div class="alert-content">
+                                    <div class="alert-title">${alert.title}</div>
+                                    <div class="alert-description">${alert.description}</div>
+                                </div>
+                                <button class="alert-action" onclick="handleAlert('${alert.id}')">${alert.action}</button>
+                            </div>
+                        `).join('');
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading alerts:', error);
+            }
+        }
+
+        // Load stats
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/coach/stats');
+                const result = await response.json();
+
+                if (result.success) {
+                    const stats = result.stats;
+                    document.getElementById('totalAthletes').textContent = stats.totalAthletes || 0;
+                    document.getElementById('activeAlerts').textContent = stats.activeAlerts || 0;
+                    document.getElementById('videosAnalyzed').textContent = stats.videosAnalyzed || 0;
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // Handle alert action
+        function handleAlert(alertId) {
+            console.log('Handling alert:', alertId);
+            // Implement alert handling logic
+        }
+
+        // Initialize page
+        loadCoachData();
+        loadAthletes();
+        loadAlerts();
+        loadStats();
+    </script>
+</body>
+</html>

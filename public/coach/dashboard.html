@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coach Dashboard - Sports Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .welcome {
+            color: #666;
+        }
+
+        .logout-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: transform 0.2s ease;
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .nav-link {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .nav-link.secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .nav-link.secondary:hover {
+            box-shadow: 0 5px 15px rgba(240, 147, 251, 0.4);
+        }
+
+        .dashboard-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-title {
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .profile-section {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .profile-info {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .info-item {
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .info-value {
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        .edit-profile {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+        }
+
+        .edit-profile h3 {
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: transform 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .message {
+            padding: 0.75rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .message.error {
+            background-color: #fee;
+            color: #c33;
+            border: 1px solid #fcc;
+        }
+
+        .message.success {
+            background-color: #efe;
+            color: #363;
+            border: 1px solid #cfc;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            border-left: 4px solid #667eea;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .coach-badge {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #333;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+
+        .govt-id {
+            background: #e8f5e8;
+            border: 1px solid #4caf50;
+            color: #2e7d32;
+            padding: 0.75rem;
+            border-radius: 5px;
+            font-weight: 500;
+            margin-top: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .user-info {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+
+            .dashboard-card {
+                padding: 1rem;
+            }
+
+            .profile-section {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            👨‍🏫 Sports Platform
+        </div>
+        <div class="user-info">
+            <span class="welcome" id="welcomeText">Welcome!</span>
+            <button class="logout-btn" id="logoutBtn">Logout</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="nav-links">
+            <a href="/coach/home" class="nav-link">
+                🏠 Home
+            </a>
+            <a href="/coach/leaderboard" class="nav-link secondary">
+                🏆 Leaderboard
+            </a>
+        </div>
+        
+        <div class="dashboard-card">
+            <h1 class="dashboard-title">🏆 Coach Dashboard</h1>
+            <div id="message"></div>
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p>Loading your profile...</p>
+            </div>
+            
+            <div id="profileContent" style="display: none;">
+                <div class="profile-section">
+                    <div class="profile-info">
+                        <h3 style="color: #333; margin-bottom: 1rem;">Your Profile</h3>
+                        <div class="coach-badge">👨‍🏫 Certified Coach</div>
+                        <div id="profileDetails">
+                            <!-- Profile details will be populated here -->
+                        </div>
+                    </div>
+
+                    <div class="edit-profile">
+                        <h3>Edit Profile</h3>
+                        <form id="editForm">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="editName">Full Name</label>
+                                    <input type="text" id="editName" name="name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="editAge">Age</label>
+                                    <input type="number" id="editAge" name="age" min="18" max="100">
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="editGender">Gender</label>
+                                    <select id="editGender" name="gender">
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="editPhone">Phone Number</label>
+                                    <input type="tel" id="editPhone" name="phone">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="editSports">Sports Category</label>
+                                <select id="editSports" name="sports">
+                                    <option value="Football">Football</option>
+                                    <option value="Basketball">Basketball</option>
+                                    <option value="Cricket">Cricket</option>
+                                    <option value="Tennis">Tennis</option>
+                                    <option value="Badminton">Badminton</option>
+                                    <option value="Swimming">Swimming</option>
+                                    <option value="Athletics">Athletics</option>
+                                    <option value="Volleyball">Volleyball</option>
+                                    <option value="Hockey">Hockey</option>
+                                    <option value="Table Tennis">Table Tennis</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="editSportsGovtId">Sports Government ID</label>
+                                <input type="text" id="editSportsGovtId" name="sportsGovtId">
+                                <div style="font-size: 0.8rem; color: #666; margin-top: 0.5rem;">
+                                    Your official sports federation or government-issued coaching ID
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn" id="updateBtn">Update Profile</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="memberDays">0</div>
+                        <div class="stat-label">Days as Coach</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="sportCategory">-</div>
+                        <div class="stat-label">Sports Category</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="coachLevel">Certified</div>
+                        <div class="stat-label">Coach Status</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const welcomeText = document.getElementById('welcomeText');
+        const profileDetailsDiv = document.getElementById('profileDetails');
+        const profileContentDiv = document.getElementById('profileContent');
+        const loadingDiv = document.getElementById('loading');
+        const messageDiv = document.getElementById('message');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const editForm = document.getElementById('editForm');
+        const updateBtn = document.getElementById('updateBtn');
+
+        function showMessage(message, type) {
+            messageDiv.innerHTML = `<div class="message ${type}">${message}</div>`;
+            setTimeout(() => {
+                messageDiv.innerHTML = '';
+            }, 5000);
+        }
+
+        function setLoading(loading) {
+            if (loading) {
+                updateBtn.disabled = true;
+                updateBtn.textContent = 'Updating...';
+            } else {
+                updateBtn.disabled = false;
+                updateBtn.textContent = 'Update Profile';
+            }
+        }
+
+        async function loadCoachInfo() {
+            try {
+                const response = await fetch('/api/coach');
+                const result = await response.json();
+
+                if (result.success) {
+                    const coach = result.coach;
+                    welcomeText.textContent = `Welcome, ${coach.name}!`;
+                    
+                    // Populate profile details
+                    profileDetailsDiv.innerHTML = `
+                        <div class="info-item">
+                            <div class="info-label">Name</div>
+                            <div class="info-value">${coach.name}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Age</div>
+                            <div class="info-value">${coach.age} years</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Gender</div>
+                            <div class="info-value">${coach.gender}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Email</div>
+                            <div class="info-value">${coach.email}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Phone</div>
+                            <div class="info-value">${coach.phone}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Sports</div>
+                            <div class="info-value">${coach.sports}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Member Since</div>
+                            <div class="info-value">${new Date(coach.createdAt).toLocaleDateString()}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Government ID</div>
+                            <div class="govt-id">${coach.sportsGovtId}</div>
+                        </div>
+                    `;
+
+                    // Populate edit form
+                    document.getElementById('editName').value = coach.name;
+                    document.getElementById('editAge').value = coach.age;
+                    document.getElementById('editGender').value = coach.gender;
+                    document.getElementById('editPhone').value = coach.phone;
+                    document.getElementById('editSports').value = coach.sports;
+                    document.getElementById('editSportsGovtId').value = coach.sportsGovtId;
+
+                    // Update stats
+                    const memberDays = Math.floor((new Date() - new Date(coach.createdAt)) / (1000 * 60 * 60 * 24));
+                    document.getElementById('memberDays').textContent = memberDays;
+                    document.getElementById('sportCategory').textContent = coach.sports;
+                    
+                    loadingDiv.style.display = 'none';
+                    profileContentDiv.style.display = 'block';
+                } else {
+                    showMessage('Failed to load coach information', 'error');
+                    loadingDiv.style.display = 'none';
+                }
+            } catch (error) {
+                showMessage('An error occurred while loading coach information', 'error');
+                loadingDiv.style.display = 'none';
+            }
+        }
+
+        editForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(editForm);
+            const data = {
+                name: formData.get('name'),
+                age: formData.get('age'),
+                gender: formData.get('gender'),
+                phone: formData.get('phone'),
+                sports: formData.get('sports'),
+                sportsGovtId: formData.get('sportsGovtId')
+            };
+
+            setLoading(true);
+
+            try {
+                const response = await fetch('/api/coach', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showMessage('Profile updated successfully!', 'success');
+                    // Reload profile info
+                    setTimeout(() => {
+                        loadCoachInfo();
+                    }, 1000);
+                } else {
+                    showMessage(result.message, 'error');
+                }
+            } catch (error) {
+                showMessage('An error occurred while updating profile', 'error');
+            } finally {
+                setLoading(false);
+            }
+        });
+
+        logoutBtn.addEventListener('click', async () => {
+            try {
+                const response = await fetch('/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    window.location.href = result.redirect;
+                } else {
+                    showMessage('Failed to logout', 'error');
+                }
+            } catch (error) {
+                showMessage('An error occurred during logout', 'error');
+            }
+        });
+
+        // Load coach info when page loads
+        loadCoachInfo();
+    </script>
+</body>
+</html>

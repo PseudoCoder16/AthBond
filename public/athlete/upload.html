@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Video - AuthBond</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        .header {
+            background: white;
+            padding: 1rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: #667eea;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: background 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: #f8f9fa;
+        }
+
+        .header-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .profile-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .container {
+            padding: 1rem;
+        }
+
+        .upload-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        .upload-area {
+            border: 2px dashed #667eea;
+            border-radius: 15px;
+            padding: 3rem 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-area:hover {
+            border-color: #5a6fd8;
+            background: #f8f9ff;
+        }
+
+        .upload-area.dragover {
+            border-color: #5a6fd8;
+            background: #f0f4ff;
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        .upload-text {
+            font-size: 1.2rem;
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .upload-subtext {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .video-preview {
+            width: 100%;
+            max-width: 500px;
+            height: 300px;
+            background: #000;
+            border-radius: 10px;
+            margin: 0 auto 1rem;
+            display: none;
+            position: relative;
+        }
+
+        .video-preview video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .video-controls {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .control-btn {
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .control-btn:hover {
+            background: rgba(0, 0, 0, 0.9);
+        }
+
+        .upload-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .upload-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .progress-container {
+            display: none;
+            margin-top: 1rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 0.5rem;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .analysis-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+            display: none;
+        }
+
+        .analysis-title {
+            font-size: 1.2rem;
+            color: #333;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .analysis-item {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .analysis-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 0.25rem;
+        }
+
+        .analysis-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .pose-visualization {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        .canvas-container {
+            position: relative;
+            display: inline-block;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .pose-canvas {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 1rem 0;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            text-decoration: none;
+            color: #666;
+            transition: color 0.2s ease;
+        }
+
+        .nav-item:hover {
+            color: #667eea;
+        }
+
+        .nav-icon {
+            font-size: 1.5rem;
+        }
+
+        .nav-label {
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .message {
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0.5rem;
+            }
+            
+            .upload-section {
+                padding: 1rem;
+            }
+            
+            .upload-area {
+                padding: 2rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <button class="back-btn" onclick="window.history.back()">←</button>
+        <h1 class="header-title">Upload Video</h1>
+        <div class="profile-icon">A</div>
+    </header>
+
+    <div class="container">
+        <div class="upload-section">
+            <div id="message"></div>
+            
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📹</div>
+                <div class="upload-text">Upload Your Training Video</div>
+                <div class="upload-subtext">Click to select or drag and drop your video file</div>
+                <input type="file" id="fileInput" class="file-input" accept="video/*">
+            </div>
+
+            <div class="video-preview" id="videoPreview">
+                <video id="videoPlayer" controls></video>
+                <div class="video-controls">
+                    <button class="control-btn" onclick="playPause()">▶️ Play</button>
+                    <button class="control-btn" onclick="resetVideo()">🔄 Reset</button>
+                </div>
+            </div>
+
+            <div class="progress-container" id="progressContainer">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText">Uploading...</div>
+            </div>
+
+            <button class="upload-btn" id="uploadBtn" onclick="uploadVideo()" disabled>
+                📤 Upload & Analyze
+            </button>
+        </div>
+
+        <div class="analysis-section" id="analysisSection">
+            <h2 class="analysis-title">🤖 AI Analysis Results</h2>
+            <div class="analysis-grid">
+                <div class="analysis-item">
+                    <div class="analysis-value" id="formScore">0%</div>
+                    <div class="analysis-label">Form Quality</div>
+                </div>
+                <div class="analysis-item">
+                    <div class="analysis-value" id="performanceScore">0%</div>
+                    <div class="analysis-label">Performance</div>
+                </div>
+                <div class="analysis-item">
+                    <div class="analysis-value" id="cheatFlag">No</div>
+                    <div class="analysis-label">Cheat Detected</div>
+                </div>
+                <div class="analysis-item">
+                    <div class="analysis-value" id="injuryRisk">Low</div>
+                    <div class="analysis-label">Injury Risk</div>
+                </div>
+            </div>
+            
+            <div class="pose-visualization">
+                <h3 style="margin-bottom: 1rem; color: #333;">Pose Detection Visualization</h3>
+                <div class="canvas-container">
+                    <canvas id="poseCanvas" class="pose-canvas"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="/athlete/home" class="nav-item">
+            <div class="nav-icon">🏠</div>
+            <div class="nav-label">Home</div>
+        </a>
+        <a href="/athlete/leaderboard" class="nav-item">
+            <div class="nav-icon">🏆</div>
+            <div class="nav-label">Leaderboard</div>
+        </a>
+    </nav>
+
+    <script>
+        let selectedFile = null;
+        let videoPlayer = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('fileInput');
+            const videoPreview = document.getElementById('videoPreview');
+            const videoPlayer = document.getElementById('videoPlayer');
+            const uploadBtn = document.getElementById('uploadBtn');
+
+            // Click to upload
+            uploadArea.addEventListener('click', () => {
+                fileInput.click();
+            });
+
+            // File selection
+            fileInput.addEventListener('change', handleFileSelect);
+
+            // Drag and drop
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleFile(files[0]);
+                }
+            });
+        });
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                handleFile(file);
+            }
+        }
+
+        function handleFile(file) {
+            if (!file.type.startsWith('video/')) {
+                showMessage('Please select a video file', 'error');
+                return;
+            }
+
+            selectedFile = file;
+            const videoPreview = document.getElementById('videoPreview');
+            const videoPlayer = document.getElementById('videoPlayer');
+            const uploadBtn = document.getElementById('uploadBtn');
+
+            // Show video preview
+            videoPreview.style.display = 'block';
+            videoPlayer.src = URL.createObjectURL(file);
+            uploadBtn.disabled = false;
+
+            // Update upload area text
+            document.querySelector('.upload-text').textContent = 'Video Selected';
+            document.querySelector('.upload-subtext').textContent = file.name;
+        }
+
+        function playPause() {
+            const video = document.getElementById('videoPlayer');
+            const btn = event.target;
+            
+            if (video.paused) {
+                video.play();
+                btn.textContent = '⏸️ Pause';
+            } else {
+                video.pause();
+                btn.textContent = '▶️ Play';
+            }
+        }
+
+        function resetVideo() {
+            const video = document.getElementById('videoPlayer');
+            video.currentTime = 0;
+            video.pause();
+            document.querySelector('.control-btn').textContent = '▶️ Play';
+        }
+
+        async function uploadVideo() {
+            if (!selectedFile) {
+                showMessage('Please select a video file first', 'error');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('video', selectedFile);
+
+            const uploadBtn = document.getElementById('uploadBtn');
+            const progressContainer = document.getElementById('progressContainer');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+
+            // Show progress
+            uploadBtn.disabled = true;
+            uploadBtn.textContent = 'Uploading...';
+            progressContainer.style.display = 'block';
+
+            try {
+                const response = await fetch('/api/athlete/upload-video', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showMessage('Video uploaded and analyzed successfully!', 'success');
+                    displayAnalysisResults(result.analysis);
+                } else {
+                    showMessage(result.message || 'Upload failed', 'error');
+                }
+            } catch (error) {
+                console.error('Upload error:', error);
+                showMessage('Upload failed. Please try again.', 'error');
+            } finally {
+                uploadBtn.disabled = false;
+                uploadBtn.textContent = '📤 Upload & Analyze';
+                progressContainer.style.display = 'none';
+            }
+        }
+
+        function displayAnalysisResults(analysis) {
+            const analysisSection = document.getElementById('analysisSection');
+            analysisSection.style.display = 'block';
+
+            // Update analysis values
+            document.getElementById('formScore').textContent = analysis.formScore + '%';
+            document.getElementById('performanceScore').textContent = analysis.performanceScore + '%';
+            document.getElementById('cheatFlag').textContent = analysis.cheatDetected ? 'Yes' : 'No';
+            document.getElementById('injuryRisk').textContent = analysis.injuryRisk;
+
+            // Draw pose visualization
+            drawPoseVisualization(analysis.poseData);
+        }
+
+        function drawPoseVisualization(poseData) {
+            const canvas = document.getElementById('poseCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Set canvas size
+            canvas.width = 400;
+            canvas.height = 300;
+
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw pose keypoints
+            if (poseData && poseData.keypoints) {
+                poseData.keypoints.forEach((keypoint, index) => {
+                    const x = keypoint.x * canvas.width;
+                    const y = keypoint.y * canvas.height;
+                    
+                    // Draw keypoint
+                    ctx.beginPath();
+                    ctx.arc(x, y, 5, 0, 2 * Math.PI);
+                    ctx.fillStyle = '#667eea';
+                    ctx.fill();
+                    
+                    // Draw connections
+                    if (index < poseData.keypoints.length - 1) {
+                        const nextKeypoint = poseData.keypoints[index + 1];
+                        const nextX = nextKeypoint.x * canvas.width;
+                        const nextY = nextKeypoint.y * canvas.height;
+                        
+                        ctx.beginPath();
+                        ctx.moveTo(x, y);
+                        ctx.lineTo(nextX, nextY);
+                        ctx.strokeStyle = '#667eea';
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                    }
+                });
+            }
+        }
+
+        function showMessage(message, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.innerHTML = `<div class="message ${type}">${message}</div>`;
+            setTimeout(() => {
+                messageDiv.innerHTML = '';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
