@@ -1,0 +1,44 @@
+# EthBond - AI-powered pose scoring system
+# Core dependencies
+
+# Computer Vision and Image Processing
+opencv-python==4.12.0.88
+opencv-contrib-python==4.12.0.88
+
+# Pose Detection and Analysis
+mediapipe==0.10.9
+
+# Machine Learning and Deep Learning
+tensorflow==2.13.0
+tensorflow-intel==2.13.0
+scikit-learn==1.7.2
+
+# Data Processing and Analysis
+numpy==1.24.3
+pandas>=1.5.0
+scipy==1.15.3
+
+# Visualization
+matplotlib==3.10.6
+seaborn>=0.11.0
+
+# Audio Processing (for potential future features)
+sounddevice==0.5.2
+
+# Utilities
+Pillow>=9.0.0
+pathlib2>=2.3.0
+
+# Development and Testing
+pytest>=7.0.0
+pytest-cov>=4.0.0
+
+# Web framework and API
+flask==2.3.3
+flask-cors==4.0.0
+werkzeug==2.3.7
+requests==2.31.0
+
+# Optional: Jupyter for development
+jupyter>=1.0.0
+ipykernel>=6.0.0
