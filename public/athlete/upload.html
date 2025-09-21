@@ -423,14 +423,27 @@
             <div class="nav-icon">🏆</div>
             <div class="nav-label">Leaderboard</div>
         </a>
+        <a href="/athlete/notifications" class="nav-item">
+            <div class="nav-icon">📬</div>
+            <div class="nav-label">Notifications</div>
+        </a>
     </nav>
 
+    <script src="/socket.io/socket.io.js"></script>
     <script>
         let selectedFile = null;
         let videoPlayer = null;
+        let socket = null;
+        let athleteId = null;
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Socket.IO
+            socket = io();
+            
+            // Get athlete ID from session (you might need to implement this)
+            getAthleteId();
+            
             const uploadArea = document.getElementById('uploadArea');
             const fileInput = document.getElementById('fileInput');
             const videoPreview = document.getElementById('videoPreview');
@@ -449,11 +462,11 @@
             uploadArea.addEventListener('dragover', (e) => {
                 e.preventDefault();
                 uploadArea.classList.add('dragover');
-            });
+            }, { passive: false });
 
             uploadArea.addEventListener('dragleave', () => {
                 uploadArea.classList.remove('dragover');
-            });
+            }, { passive: true });
 
             uploadArea.addEventListener('drop', (e) => {
                 e.preventDefault();
@@ -462,8 +475,85 @@
                 if (files.length > 0) {
                     handleFile(files[0]);
                 }
+            }, { passive: false });
+
+            // Socket.IO event listeners
+            socket.on('upload-progress', (data) => {
+                updateProgress(data.progress, data.message);
+            });
+
+            socket.on('analysis-progress', (data) => {
+                updateProgress(data.progress, data.message);
+            });
+
+            socket.on('upload-complete', (data) => {
+                updateProgress(data.progress, data.message);
+                displayAnalysisResults(data.analysis);
+            });
+
+            socket.on('upload-error', (data) => {
+                showMessage(data.message, 'error');
+                resetUploadState();
+            });
+
+            socket.on('leaderboard-changed', (data) => {
+                showNotification(data.message);
             });
         });
+
+        async function getAthleteId() {
+            try {
+                const response = await fetch('/api/athlete');
+                const result = await response.json();
+                if (result.success) {
+                    athleteId = result.athlete.id;
+                    socket.emit('join-athlete', athleteId);
+                }
+            } catch (error) {
+                console.error('Error getting athlete ID:', error);
+            }
+        }
+
+        function updateProgress(progress, message) {
+            const progressContainer = document.getElementById('progressContainer');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            
+            progressContainer.style.display = 'block';
+            progressFill.style.width = progress + '%';
+            progressText.textContent = message;
+        }
+
+        function resetUploadState() {
+            const uploadBtn = document.getElementById('uploadBtn');
+            const progressContainer = document.getElementById('progressContainer');
+            
+            uploadBtn.disabled = false;
+            uploadBtn.textContent = '📤 Upload & Analyze';
+            progressContainer.style.display = 'none';
+        }
+
+        function showNotification(message) {
+            // Create a temporary notification
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #4CAF50;
+                color: white;
+                padding: 1rem;
+                border-radius: 5px;
+                z-index: 1000;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 3000);
+        }
 
         function handleFileSelect(event) {
             const file = event.target.files[0];
@@ -519,18 +609,34 @@
                 return;
             }
 
+            // Check if user is authenticated
+            try {
+                const authCheck = await fetch('/api/athlete');
+                if (!authCheck.ok) {
+                    showMessage('Please log in to upload videos', 'error');
+                    setTimeout(() => {
+                        window.location.href = '/athlete/login';
+                    }, 2000);
+                    return;
+                }
+            } catch (error) {
+                console.error('Authentication check failed:', error);
+                showMessage('Please log in to upload videos', 'error');
+                setTimeout(() => {
+                    window.location.href = '/athlete/login';
+                }, 2000);
+                return;
+            }
+
             const formData = new FormData();
             formData.append('video', selectedFile);
 
             const uploadBtn = document.getElementById('uploadBtn');
-            const progressContainer = document.getElementById('progressContainer');
-            const progressFill = document.getElementById('progressFill');
-            const progressText = document.getElementById('progressText');
 
-            // Show progress
+            // Show initial progress
             uploadBtn.disabled = true;
             uploadBtn.textContent = 'Uploading...';
-            progressContainer.style.display = 'block';
+            updateProgress(10, 'Uploading video...');
 
             try {
                 const response = await fetch('/api/athlete/upload-video', {
@@ -538,21 +644,36 @@
                     body: formData
                 });
 
+                console.log('Upload response status:', response.status);
+                
+                if (response.status === 404) {
+                    showMessage('Upload endpoint not found. Please refresh the page and try again.', 'error');
+                    resetUploadState();
+                    return;
+                }
+                
+                if (response.status === 401) {
+                    showMessage('Please log in to upload videos', 'error');
+                    setTimeout(() => {
+                        window.location.href = '/athlete/login';
+                    }, 2000);
+                    return;
+                }
+
                 const result = await response.json();
+                console.log('Upload result:', result);
 
                 if (result.success) {
                     showMessage('Video uploaded and analyzed successfully!', 'success');
-                    displayAnalysisResults(result.analysis);
+                    // Analysis results will be displayed via Socket.IO events
                 } else {
                     showMessage(result.message || 'Upload failed', 'error');
+                    resetUploadState();
                 }
             } catch (error) {
                 console.error('Upload error:', error);
                 showMessage('Upload failed. Please try again.', 'error');
-            } finally {
-                uploadBtn.disabled = false;
-                uploadBtn.textContent = '📤 Upload & Analyze';
-                progressContainer.style.display = 'none';
+                resetUploadState();
             }
         }
 

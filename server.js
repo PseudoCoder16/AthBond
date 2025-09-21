@@ -1,7 +1,7 @@
-const { app, PORT } = require('./src/app');
+const { app, server, PORT } = require('./src/app');
 
 // Start server
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`🏆 Sports Athlete Server is running on http://localhost:${PORT}`);
     console.log('\n📋 Available routes:');
     console.log('🎨 Pages:');

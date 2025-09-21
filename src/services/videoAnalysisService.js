@@ -234,14 +234,21 @@ class VideoAnalysisService {
         // In production, analyze sport-specific movements
         const baseScore = Math.random() * 40 + 60;
         
+        // Ensure sports is defined and is a string
+        const sportType = (sports && typeof sports === 'string') ? sports.toLowerCase() : 'general';
+        
         // Adjust based on sports type
-        switch (sports.toLowerCase()) {
+        switch (sportType) {
             case 'football':
                 return baseScore * 1.1; // Slightly higher for football
             case 'basketball':
                 return baseScore * 1.05;
             case 'tennis':
                 return baseScore * 1.15;
+            case 'cricket':
+                return baseScore * 1.08;
+            case 'soccer':
+                return baseScore * 1.1;
             default:
                 return baseScore;
         }
@@ -318,8 +325,11 @@ class VideoAnalysisService {
             technique: 0.1
         };
 
+        // Ensure sports is defined and is a string
+        const sportType = (sports && typeof sports === 'string') ? sports.toLowerCase() : 'general';
+
         // Adjust weights based on sports
-        switch (sports.toLowerCase()) {
+        switch (sportType) {
             case 'football':
                 weights.technique = 0.2;
                 weights.form = 0.25;

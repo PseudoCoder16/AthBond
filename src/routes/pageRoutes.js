@@ -45,6 +45,10 @@ router.get('/athlete/leaderboard', requireAthleteAuth, (req, res) => {
     res.sendFile(path.join(__dirname, '../../public/athlete/leaderboard.html'));
 });
 
+router.get('/athlete/notifications', requireAthleteAuth, (req, res) => {
+    res.sendFile(path.join(__dirname, '../../public/athlete/notifications.html'));
+});
+
 // Coach pages
 router.get('/coach/login', (req, res) => {
     if (req.session.coachId) {

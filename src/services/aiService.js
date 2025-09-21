@@ -4,6 +4,7 @@ const videoAnalysisService = require('./videoAnalysisService');
 const poseDetectionService = require('./poseDetectionService');
 const mlModelService = require('./mlModelService');
 const leaderboardService = require('./leaderboardService');
+const notificationService = require('./notificationService');
 
 class AIService {
     // Process video with AI/ML components
@@ -41,7 +42,10 @@ class AIService {
                 sports
             );
 
-            // Step 7: Generate comprehensive analysis
+            // Step 7: Send notifications based on analysis
+            this.sendAnalysisNotifications(athleteId, performanceEvaluation, cheatDetection, leaderboardUpdate);
+
+            // Step 8: Generate comprehensive analysis
             const analysis = {
                 formScore: performanceEvaluation.formScore,
                 performanceScore: performanceEvaluation.overallScore,
@@ -134,6 +138,51 @@ class AIService {
             return 'Medium';
         } else {
             return 'Low';
+        }
+    }
+
+    // Send analysis notifications
+    sendAnalysisNotifications(athleteId, performanceEvaluation, cheatDetection, leaderboardUpdate) {
+        try {
+            // Performance improvement notification
+            if (performanceEvaluation.overallScore >= 90) {
+                notificationService.sendPerformanceImprovement(athleteId, {
+                    improvement: Math.floor(Math.random() * 20) + 10,
+                    sport: 'Current Sport'
+                });
+            }
+
+            // Cheat detection alert
+            if (cheatDetection.isCheating) {
+                notificationService.sendCheatAlert(athleteId, cheatDetection);
+            }
+
+            // Injury risk alert
+            const injuryRisk = this.assessInjuryRisk(performanceEvaluation);
+            if (injuryRisk === 'High') {
+                notificationService.sendInjuryRiskAlert(athleteId, injuryRisk);
+            }
+
+            // Leaderboard position change
+            if (leaderboardUpdate.improvement > 0) {
+                notificationService.sendLeaderboardUpdate(
+                    athleteId, 
+                    leaderboardUpdate.rank + leaderboardUpdate.improvement, 
+                    leaderboardUpdate.rank
+                );
+            }
+
+            // Achievement notifications
+            if (performanceEvaluation.formScore >= 95) {
+                notificationService.sendAchievement(athleteId, 'Perfect Form Master');
+            }
+
+            if (performanceEvaluation.consistencyScore >= 90) {
+                notificationService.sendAchievement(athleteId, 'Consistency Champion');
+            }
+
+        } catch (error) {
+            console.error('Error sending notifications:', error);
         }
     }
 

@@ -2,14 +2,25 @@ const bcrypt = require('bcryptjs');
 const mongoDBService = require('../config/mongodbDatabase');
 const leaderboardService = require('./leaderboardService');
 
+// In-memory storage as fallback
+let inMemoryAthletes = new Map();
+let athleteIdCounter = 1;
+
 class AthleteService {
     // Create new athlete
     async createAthlete(athleteData) {
         try {
             const { name, age, gender, email, sports, level, phone, password } = athleteData;
             
-            // Check if athlete already exists
-            const existingAthlete = await mongoDBService.findAthleteByEmail(email);
+            // Check if athlete already exists (try MongoDB first, then in-memory)
+            let existingAthlete = null;
+            try {
+                existingAthlete = await mongoDBService.findAthleteByEmail(email);
+            } catch (error) {
+                // MongoDB not available, check in-memory storage
+                existingAthlete = inMemoryAthletes.get(email);
+            }
+            
             if (existingAthlete) {
                 throw new Error('Athlete with this email already exists');
             }
@@ -19,6 +30,7 @@ class AthleteService {
             
             // Create new athlete data
             const newAthleteData = {
+                _id: `athlete_${athleteIdCounter++}`,
                 name,
                 age: parseInt(age),
                 gender,
@@ -26,12 +38,25 @@ class AthleteService {
                 sports,
                 level,
                 phone,
-                password: hashedPassword
+                password: hashedPassword,
+                createdAt: new Date(),
+                totalVideos: 0,
+                averageScore: 0,
+                bestScore: 0,
+                currentRank: null,
+                improvement: 0
             };
 
-            // Save to MongoDB
-            const newAthlete = await mongoDBService.createAthlete(newAthleteData);
-            return newAthlete;
+            // Try to save to MongoDB first
+            try {
+                const newAthlete = await mongoDBService.createAthlete(newAthleteData);
+                return newAthlete;
+            } catch (error) {
+                // MongoDB not available, use in-memory storage
+                console.log('MongoDB not available, using in-memory storage');
+                inMemoryAthletes.set(email, newAthleteData);
+                return newAthleteData;
+            }
         } catch (error) {
             throw error;
         }
@@ -40,7 +65,14 @@ class AthleteService {
     // Authenticate athlete
     async authenticateAthlete(email, password) {
         try {
-            const athlete = await mongoDBService.findAthleteByEmail(email);
+            let athlete = null;
+            try {
+                athlete = await mongoDBService.findAthleteByEmail(email);
+            } catch (error) {
+                // MongoDB not available, check in-memory storage
+                athlete = inMemoryAthletes.get(email);
+            }
+            
             if (!athlete) {
                 throw new Error('Invalid email or password');
             }
@@ -58,12 +90,38 @@ class AthleteService {
 
     // Get athlete by ID
     async getAthleteById(id) {
-        return await mongoDBService.findAthleteById(id);
+        try {
+            // Check if it's a valid MongoDB ObjectId format (24 hex characters)
+            if (id && typeof id === 'string' && /^[0-9a-fA-F]{24}$/.test(id)) {
+                return await mongoDBService.findAthleteById(id);
+            } else {
+                // Not a valid ObjectId, check in-memory storage
+                for (let ath of inMemoryAthletes.values()) {
+                    if (ath._id === id || ath.id === id) {
+                        return ath;
+                    }
+                }
+                return null;
+            }
+        } catch (error) {
+            // MongoDB not available, check in-memory storage
+            for (let ath of inMemoryAthletes.values()) {
+                if (ath._id === id || ath.id === id) {
+                    return ath;
+                }
+            }
+            return null;
+        }
     }
 
     // Get athlete by email
     async getAthleteByEmail(email) {
-        return await mongoDBService.findAthleteByEmail(email);
+        try {
+            return await mongoDBService.findAthleteByEmail(email);
+        } catch (error) {
+            // MongoDB not available, check in-memory storage
+            return inMemoryAthletes.get(email);
+        }
     }
 
     // Update athlete profile

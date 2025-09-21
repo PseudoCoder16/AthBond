@@ -324,6 +324,9 @@
             <a href="/athlete/upload" class="nav-link">
                 📹 Upload Video
             </a>
+            <a href="/athlete/notifications" class="nav-link">
+                📬 Notifications
+            </a>
         </div>
         
         <div class="dashboard-card">
@@ -422,8 +425,11 @@
         </div>
     </div>
 
+    <script src="/socket.io/socket.io.js"></script>
     <script>
         const welcomeText = document.getElementById('welcomeText');
+        let socket = null;
+        let athleteId = null;
         const profileDetailsDiv = document.getElementById('profileDetails');
         const profileContentDiv = document.getElementById('profileContent');
         const loadingDiv = document.getElementById('loading');
@@ -437,6 +443,57 @@
             setTimeout(() => {
                 messageDiv.innerHTML = '';
             }, 5000);
+        }
+
+        // Initialize Socket.IO
+        document.addEventListener('DOMContentLoaded', function() {
+            socket = io();
+            getAthleteId();
+            
+            // Listen for real-time updates
+            socket.on('leaderboard-changed', (data) => {
+                showNotification(data.message);
+            });
+
+            socket.on('notification', (data) => {
+                showNotification(data.message);
+            });
+        }, { passive: true });
+
+        async function getAthleteId() {
+            try {
+                const response = await fetch('/api/athlete');
+                const result = await response.json();
+                if (result.success) {
+                    athleteId = result.athlete.id;
+                    socket.emit('join-athlete', athleteId);
+                    // Also load the athlete info to display the name
+                    loadAthleteInfo();
+                }
+            } catch (error) {
+                console.error('Error getting athlete ID:', error);
+            }
+        }
+
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #4CAF50;
+                color: white;
+                padding: 1rem;
+                border-radius: 5px;
+                z-index: 1000;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 3000);
         }
 
         function setLoading(loading) {
@@ -453,9 +510,11 @@
             try {
                 const response = await fetch('/api/athlete');
                 const result = await response.json();
+                console.log('Athlete API response:', result);
 
                 if (result.success) {
                     const athlete = result.athlete;
+                    console.log('Athlete data:', athlete);
                     welcomeText.textContent = `Welcome, ${athlete.name}!`;
                     
                     // Populate profile details
@@ -583,8 +642,7 @@
             }
         });
 
-        // Load athlete info when page loads
-        loadAthleteInfo();
+        // Athlete info is now loaded in getAthleteId() function
     </script>
 </body>
 </html>
