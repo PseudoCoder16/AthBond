@@ -1,199 +1,122 @@
-# 🏆 AthBond - AI-Powered Sports Platform
+<div align="center">
 
-A comprehensive sports management system that combines AI-powered pose analysis with athlete-coach collaboration, built using both Python ML pipeline and Node.js web platform.
+# Genignite Pre-Hackathon Submission Template 
 
-## 🌟 Features
+<img src="assets/logo/f58664d6c437.jpg" alt="Genignite Pre-Hackathon Logo"/>
 
-### **🤖 AI-Powered Pose Analysis (Python Backend)**
-- **Real-time Pose Detection**: Using MediaPipe for accurate pose landmark extraction
-- **Advanced ML Models**: TensorFlow-based models for pose scoring and classification
-- **Intuitive Scoring System**: 0-100 point scale with color-coded performance levels
-- **Rep Counting**: Automatic rep detection (180° → 0° → 180°) with state machine logic
-- **Video Processing**: OpenCV-based video capture and frame preprocessing
-- **Comprehensive Evaluation**: Detailed metrics including accuracy, precision, recall, and confusion matrices
-- **Modular Architecture**: Clean, well-documented codebase with separate modules for each component
-
-### **👥 Sports Management Platform (Node.js Frontend)**
-- **For Athletes:**
-  - 🏃‍♂️ **Athlete Registration** - Complete profile with sports category and competition level
-  - 📊 **Profile Management** - Update personal information and sports details
-  - 🏅 **Level Tracking** - District, State, and National level management
-  - 📱 **Responsive Dashboard** - Modern, mobile-friendly interface
-
-- **For Coaches:**
-  - 👨‍🏫 **Coach Registration** - Professional coach profiles with government ID verification
-  - 🎯 **Sports Expertise** - Specialized coaching in various sports categories
-  - 📈 **Athlete Management** - Track and mentor athletes
-  - 🔒 **Verified Credentials** - Government-issued sports ID validation
-
-### **Platform Features:**
-- 🔐 **Secure Authentication** - Separate login systems for athletes and coaches
-- 🛡️ **Password Security** - Bcrypt hashing for password protection
-- 📱 **Responsive Design** - Works seamlessly on desktop and mobile
-- ⚡ **Real-time Validation** - Client and server-side form validation
-- 🎨 **Modern UI/UX** - Beautiful gradient designs with smooth animations
-
-## 🚀 Quick Start
-
-### Prerequisites
-- **Python 3.8+** (for ML pipeline)
-- **Node.js v14+** (for web platform)
-- **npm** (Node Package Manager)
-
-### Installation
-
-#### 1. **Python ML Pipeline Setup:**
-```bash
-# Clone the repository
-git clone https://github.com/PseudoCoder16/AthBond.git
-cd AthBond
-
-# Create virtual environment
-python -m venv version
-.\version\Scripts\Activate.ps1  # Windows
-# source version/bin/activate    # Linux/Mac
-
-# Install Python dependencies
-pip install -r requirements.txt
-
-# Run the ML pipeline
-python main.py --mode infer
-```
-
-#### 2. **Node.js Web Platform Setup:**
-```bash
-# Install Node.js dependencies
-npm install
-
-# Start the web server
-npm start
-# or
-node server.js
-```
-
-## 📁 Project Structure
-
-```
-AthBond/
-├── 🤖 Python ML Pipeline
-│   ├── main.py                 # Main application entry point
-│   ├── tensorflow_model.py     # ML model and rep counting
-│   ├── mediapipe_utils.py      # Pose detection utilities
-│   ├── opencv_utils.py         # Video processing utilities
-│   ├── ml_eval.py             # Model evaluation metrics
-│   ├── video_analyzer.py      # Video upload and analysis
-│   ├── user_manager.py        # User data management
-│   ├── api_server.py          # Flask REST API
-│   └── requirements.txt       # Python dependencies
-│
-├── 🌐 Node.js Web Platform
-│   ├── server.js              # Main server file
-│   ├── package.json           # Node.js dependencies
-│   ├── src/                   # Source code
-│   │   ├── controllers/       # Route controllers
-│   │   ├── models/           # Database models
-│   │   ├── routes/           # API routes
-│   │   └── services/         # Business logic
-│   └── public/               # Frontend files
-│       ├── athlete/          # Athlete pages
-│       └── coach/            # Coach pages
-│
-└── 📊 Data Storage
-    ├── data/                 # Training data (ignored by Git)
-    ├── models/              # ML models (ignored by Git)
-    ├── uploads/             # Video uploads (ignored by Git)
-    ├── user_data/           # User analytics (ignored by Git)
-    └── results/             # Analysis results (ignored by Git)
-```
-
-## 🎯 Usage
-
-### **Real-time Pose Analysis:**
-```bash
-# Activate virtual environment
-.\version\Scripts\Activate.ps1
-
-# Run real-time pose detection
-python main.py --mode infer
-
-# Run video analysis
-python main.py --mode analyze --video path/to/video.mp4
-
-# Train new model
-python main.py --mode train --data data/training/
-```
-
-### **Web Platform:**
-```bash
-# Start the web server
-npm start
-
-# Access the platform
-# Athletes: http://localhost:3000/athlete
-# Coaches: http://localhost:3000/coach
-```
-
-### **API Endpoints:**
-```bash
-# Start Flask API server
-python start_server.py
-
-# Upload video for analysis
-curl -X POST -F "file=@video.mp4" http://localhost:5000/api/upload
-
-# Get user progress
-curl http://localhost:5000/api/user/{user_id}/progress
-```
-
-## 🔧 Configuration
-
-### **Environment Variables:**
-Create `.env` file:
-```env
-# Database
-MONGODB_URI=mongodb://localhost:27017/athbond
-SESSION_SECRET=your-secret-key
-
-# ML Pipeline
-MODEL_PATH=models/best_model.h5
-UPLOAD_DIR=uploads/
-RESULTS_DIR=results/
-```
-
-## 📊 ML Pipeline Details
-
-### **Scoring System:**
-- **Angle < 90°**: Score 80-100 (Excellent form)
-- **Angle ≥ 90°**: Score 0-20 (Needs improvement)
-- **Rep Counting**: Tracks complete movement cycles (180° → 0° → 180°)
-
-### **Model Architecture:**
-- **Input**: 33 MediaPipe pose landmarks (4D coordinates)
-- **Output**: Pose score (0-100) and rep count
-- **Framework**: TensorFlow/Keras with custom loss functions
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 👥 Team
-
-- **PseudoCoder16** - Lead Developer
-- **AI/ML Team** - Pose analysis and scoring algorithms
-- **Frontend Team** - Web platform and user interface
-
-## 🆘 Support
-
-For support, email support@athbond.com or create an issue in the repository.
+<br/>
 
 ---
 
-**Built with ❤️ for athletes and coaches worldwide**
+The Submission Template for GenIgnite Pre-Hackathon IPEC
+
+</div>
+
+## 1. Problem Statement Name
+
+ AI-Powered Sports Talent Ecosystem
+
+---
+
+## 2. Problem Statement Description
+
+Our platforms ensures that no athlete is left unseen. So we
+have created an AI-powered video assessment with gamified
+dashboard with performance score. we give every player
+
+from rural villages to metro cities -- a fair chance to
+showcase their skills. It also empowers ex-athletes as
+
+coaches to get recognition and financial support.
+
+---
+
+## 3. Project Overview
+
+How It Works (Flow)
+
+- Athlete uploads training video
+
+- AI analyzes→ feedback + risk alerts
+
+- Coaches review & mentor athletes
+
+- Gamified challenges & leaderboards
+
+---
+
+## 4. Architecture
+
+- **Frontend:** HTML/CSS dashboard for auth, athlete and coach 
+- **Backend:** FastAPI server for authentication, Node.js and Express.js  
+- **Database:** MongoDB Atlas  
+- **AI Services:** MediaPipe and OpenCV for pose detection & Tensorflow framework & ML modal evolution matrix
+- **Deployment:** Dockerized microservices on Render
+
+---
+
+## 5. Tech Stack
+
+The technologies used for this project are:
+
+- Frontend: HTML , CSS
+
+- Backend: Node.js, Express.js
+
+- Database: MongoDB
+
+- AI/ML: MediaPipe and OpenCV for pose detection &
+Tensorflow framework & ML modal evolution matrix
+
+- GitHub Actions  
+
+---
+
+## 6. Team Name
+
+CodeSpecs
+
+---
+
+## 7. Team Members & Details
+
+| Name                | Role                | Email                       | LinkedIn                        | College Name                      |             |
+|---------------------|---------------------|-----------------------------|---------------------------------|-----------------------------------|             |
+| Vansh Jain          | Team Lead, Backend  | vanshjain4520@gmail.com          | [LinkedIn](https://www.linkedin.com/in/vansh-jain-567506219)   | SRM IST NCR |
+| Atishay Jain        | Backend             | aj3026@srmist.edu.in             | [LinkedIn](https://www.linkedin.com/in/atishay-jain-433594326) | SRM IST NCR |
+| Yash Vardhan Raj    | Database            | yashvar.raj16@gmail.com          | [LinkedIn](http://www.linkedin.com/in/yashvardhan-raj)         | SRM IST NCR |
+| Yuvraj Singh        | Frontend & AI       | singhyuvraj1051@gmail.com        | [LinkedIn](http://www.linkedin.com/in/yuvraj-singh-7b4209191)  | SRM IST NCR |
+| Ankur Pratap Singh  | Frontend & AI       | ankurpratapsingh0303@gmail.com   | [LinkedIn](http://www.linkedin.com/in/ankurpratapsingh0303)    | SRM IST NCR |
+| Aryan Gupta         | Deployement & PPT   | ag9957@srmist.edu.in             | [LinkedIn](http://www.linkedin.com/in/aryan-gupta-37bb24329)   | SRM IST NCR |
+| [Add more members as needed] | [Role] | [Email] | [LinkedIn] |
+
+---
+
+## 8. Additional Links
+
+N/A
+
+---
+
+## 9. Instructions for Evaluators
+
+Clone the repository, install dependencies with `npm install`, and run `npm start`. The auth dashboard is accessible at `/src`. See the documentation for API endpoints.
+
+---
+
+## Submission Guidelines
+
+- **Copy this template exactly.** Do not change section names or order.
+- **Fill in every section clearly and professionally.**
+- **Include accurate contact details for all team members.**
+- **Provide working links to demos and repositories.**
+- **Add architectural diagrams if possible (as images or markdown).**
+- **Use professional, concise language.**
+
+---
+
+Thank you for your submission and participation in GenIgnite Pre-Hackathon at IPEC!
+
+---
+
+**Team HackWithIndia x Devnovate**
