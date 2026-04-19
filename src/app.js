@@ -16,6 +16,7 @@ const athleteRoutes = require('./routes/athleteRoutes');
 const coachRoutes = require('./routes/coachRoutes');
 const leaderboardRoutes = require('./routes/leaderboardRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
+const aiRoutes = require('./routes/aiRoutes');
 
 const app = express();
 const server = http.createServer(app);
@@ -48,6 +49,7 @@ app.use('/', athleteRoutes);
 app.use('/', coachRoutes);
 app.use('/', leaderboardRoutes);
 app.use('/', notificationRoutes);
+app.use('/', aiRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

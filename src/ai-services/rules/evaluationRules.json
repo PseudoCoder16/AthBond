@@ -1,0 +1,29 @@
+[
+  {
+    "id": "knee_angle_injury_high",
+    "metric": "kneeAngle",
+    "operator": "<",
+    "threshold": 145,
+    "severity": "HIGH",
+    "message": "Knee angle is below safe threshold. Injury risk is high.",
+    "recommendation": "Add mobility and controlled squat-depth drills."
+  },
+  {
+    "id": "speed_strength_recommendation",
+    "metric": "speed",
+    "operator": "<",
+    "threshold": 4.5,
+    "severity": "MEDIUM",
+    "message": "Movement speed is below target.",
+    "recommendation": "Include lower-body strength and acceleration training."
+  },
+  {
+    "id": "balance_low",
+    "metric": "balance",
+    "operator": "<",
+    "threshold": 60,
+    "severity": "MEDIUM",
+    "message": "Balance score indicates instability.",
+    "recommendation": "Prioritize single-leg stability and core work."
+  }
+]

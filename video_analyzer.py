@@ -20,9 +20,9 @@ from typing import Dict, List, Tuple, Optional
 from datetime import datetime
 import uuid
 
-from mediapipe_utils import PoseDetector, KeypointExtractor
-from tensorflow_model import ModelScorer
-from opencv_utils import FrameProcessor
+from pose_detection import PoseDetectionPipeline
+from analysis import BiomechanicsAnalyzer
+from scoring import PoseScoringEngine
 
 logger = logging.getLogger(__name__)
 
@@ -48,10 +48,11 @@ class VideoAnalyzer:
         self.results_dir.mkdir(parents=True, exist_ok=True)
         
         # Initialize components
-        self.pose_detector = PoseDetector()
-        self.keypoint_extractor = KeypointExtractor()
-        self.model_scorer = ModelScorer()
-        self.frame_processor = FrameProcessor()
+        self.pose_pipeline = PoseDetectionPipeline()
+        self.biomechanics_analyzer = BiomechanicsAnalyzer()
+        self.scoring_engine = PoseScoringEngine()
+        self.rep_state = "up"
+        self.rep_count = 0
         
         logger.info("Video analyzer initialized")
     
@@ -91,6 +92,7 @@ class VideoAnalyzer:
             scores = []
             angles = []
             rep_states = []
+            issue_counter = {}
             
             frame_idx = 0
             processed_frames = 0
@@ -109,38 +111,45 @@ class VideoAnalyzer:
                 
                 processed_frames += 1
                 
-                # Process frame
-                processed_frame = self.frame_processor.preprocess_frame(frame)
-                
-                # Detect pose
-                pose_results = self.pose_detector.detect_pose(processed_frame)
-                
-                if pose_results.pose_landmarks:
-                    # Extract keypoints
-                    keypoints = self.keypoint_extractor.extract_keypoints(pose_results)
-                    
-                    # Score pose and get rep data
-                    result = self.model_scorer.score_pose(None, keypoints)
-                    
-                    # Store results
+                pose_result = self.pose_pipeline.detect(frame)
+
+                if pose_result.landmarks is not None and pose_result.visibility is not None:
+                    biomechanics = self.biomechanics_analyzer.analyze(
+                        pose_result.landmarks, pose_result.visibility
+                    )
+                    score_result = self.scoring_engine.evaluate(
+                        biomechanics.angles,
+                        biomechanics.posture_score,
+                        biomechanics.balance_score,
+                        biomechanics.asymmetry,
+                    )
+
+                    rep_count, rep_state = self._update_rep_counter(score_result["angles"]["knee"])
+
                     frame_data = {
                         'frame_idx': frame_idx,
                         'timestamp': frame_idx / fps if fps > 0 else 0,
-                        'score': result['score'],
-                        'angle': result['angle'],
-                        'rep_count': result['rep_count'],
-                        'rep_state': result['rep_state'],
-                        'left_angle': result['left_angle'],
-                        'right_angle': result['right_angle']
+                        'score': score_result['performance'],
+                        'form_quality': score_result['form_quality'],
+                        'angle': score_result['angles']['knee'],
+                        'rep_count': rep_count,
+                        'rep_state': rep_state,
+                        'injury_risk': score_result['injury_risk'],
+                        'issues': score_result['issues'],
+                        'suggestions': score_result['suggestions'],
+                        'angles': score_result['angles'],
+                        'component_scores': score_result['component_scores']
                     }
-                    
+
                     frame_results.append(frame_data)
-                    scores.append(result['score'])
-                    angles.append(result['angle'])
-                    rep_states.append(result['rep_state'])
-                    
-                    # Update total reps
-                    total_reps = max(total_reps, result['rep_count'])
+                    scores.append(score_result['performance'])
+                    angles.append(score_result['angles']['knee'])
+                    rep_states.append(rep_state)
+
+                    for issue in score_result["issues"]:
+                        issue_counter[issue] = issue_counter.get(issue, 0) + 1
+
+                    total_reps = max(total_reps, rep_count)
                 
                 # Progress logging
                 if processed_frames % 30 == 0:  # Every 30 processed frames
@@ -153,6 +162,13 @@ class VideoAnalyzer:
             analysis_results = self._calculate_metrics(
                 frame_results, scores, angles, total_reps, duration, fps
             )
+
+            common_issues = sorted(issue_counter.items(), key=lambda x: x[1], reverse=True)
+            top_issues = [issue for issue, _ in common_issues[:3]]
+            top_suggestions = []
+            if frame_results:
+                # Use the latest frame suggestions as immediate next actions.
+                top_suggestions = frame_results[-1].get("suggestions", [])[:3]
             
             # Add metadata
             analysis_results.update({
@@ -166,6 +182,8 @@ class VideoAnalyzer:
                 'duration': duration,
                 'fps': fps
             })
+            analysis_results["issues"] = top_issues
+            analysis_results["suggestions"] = top_suggestions
             
             # Save results
             self._save_analysis_results(analysis_results)
@@ -219,6 +237,14 @@ class VideoAnalyzer:
         # Calculate form quality (based on angle consistency and score)
         angle_std = np.std(angles)
         form_quality = max(0, 100 - (angle_std / 10))  # Convert to 0-100 scale
+
+        # Derive injury risk from frame-level rules.
+        risk_rank = {"Low": 0, "Medium": 1, "High": 2}
+        injury_risk = "Low"
+        for frame in frame_results:
+            fr = frame.get("injury_risk", "Low")
+            if risk_rank.get(fr, 0) > risk_rank[injury_risk]:
+                injury_risk = fr
         
         # Calculate improvement (placeholder - would need historical data)
         improvement = 0  # This would be calculated based on previous sessions
@@ -237,10 +263,27 @@ class VideoAnalyzer:
             'improvement': improvement,
             'consistency': round(consistency, 2),
             'form_quality': round(form_quality, 2),
+            'performance': round(avg_score, 2),
+            'injury_risk': injury_risk,
             'score_std': round(score_std, 2),
             'angle_std': round(angle_std, 2),
             'reps_per_minute': round((total_reps / duration) * 60, 2) if duration > 0 else 0
         }
+
+    def _update_rep_counter(self, knee_angle: float) -> Tuple[int, str]:
+        """
+        Simple rep state machine based on knee flexion-extension cycle.
+        """
+        down_threshold = 100.0
+        up_threshold = 150.0
+
+        if self.rep_state == "up" and knee_angle <= down_threshold:
+            self.rep_state = "down"
+        elif self.rep_state == "down" and knee_angle >= up_threshold:
+            self.rep_state = "up"
+            self.rep_count += 1
+
+        return self.rep_count, self.rep_state
     
     def _assign_badges(self, avg_score: float, total_reps: int, 
                       consistency: float, form_quality: float) -> List[Dict]:

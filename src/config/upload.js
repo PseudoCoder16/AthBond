@@ -35,7 +35,31 @@ const upload = multer({
     fileFilter: fileFilter
 });
 
+const documentFileFilter = (req, file, cb) => {
+    const allowed = [
+        'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'text/plain'
+    ];
+
+    if (allowed.includes(file.mimetype)) {
+        cb(null, true);
+    } else {
+        cb(new Error('Only PDF, DOC, DOCX, and TXT files are allowed'), false);
+    }
+};
+
+const documentUpload = multer({
+    storage,
+    limits: {
+        fileSize: 25 * 1024 * 1024
+    },
+    fileFilter: documentFileFilter
+});
+
 module.exports = {
     upload,
+    documentUpload,
     uploadsDir
 };

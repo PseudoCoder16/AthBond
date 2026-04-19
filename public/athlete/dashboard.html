@@ -272,6 +272,76 @@
             font-size: 0.9rem;
         }
 
+        .ai-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .ai-card {
+            background: #f8f9fa;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .ai-card h3 {
+            color: #333;
+            margin-bottom: 0.75rem;
+        }
+
+        .coach-chat-log {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            min-height: 180px;
+            max-height: 280px;
+            overflow-y: auto;
+            padding: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .chat-bubble {
+            padding: 0.6rem 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+            font-size: 0.95rem;
+        }
+
+        .chat-bubble.user {
+            background: #e8ecff;
+            color: #1f2a44;
+        }
+
+        .chat-bubble.ai {
+            background: #eef9ef;
+            color: #22452d;
+        }
+
+        .inline-form {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .inline-form input {
+            flex: 1;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 0.6rem 0.75rem;
+        }
+
+        .plan-output {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 0.75rem;
+            white-space: pre-wrap;
+            min-height: 120px;
+            color: #333;
+        }
+
         @media (max-width: 768px) {
             .header {
                 padding: 1rem;
@@ -297,6 +367,10 @@
             }
 
             .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .ai-grid {
                 grid-template-columns: 1fr;
             }
         }
@@ -421,6 +495,37 @@
                         <div class="stat-label">Sports Category</div>
                     </div>
                 </div>
+
+                <div class="ai-grid">
+                    <div class="ai-card">
+                        <h3>AI Coach Knowledge Base</h3>
+                        <p style="color:#666; margin-bottom:0.75rem;">Upload coaching PDFs/DOCs for RAG-grounded advice.</p>
+                        <form id="docUploadForm" class="inline-form">
+                            <input type="file" id="coachDocument" accept=".pdf,.doc,.docx,.txt" required />
+                            <button type="submit" class="btn" id="docUploadBtn">Upload</button>
+                        </form>
+                        <div id="docUploadStatus" style="margin-top:0.75rem; color:#555;"></div>
+                    </div>
+
+                    <div class="ai-card">
+                        <h3>AI Coach Chat</h3>
+                        <div class="coach-chat-log" id="coachChatLog">
+                            <div class="chat-bubble ai">Ask me about technique, injury prevention, or training progression.</div>
+                        </div>
+                        <form id="coachQueryForm" class="inline-form">
+                            <input type="text" id="coachQuestion" placeholder="Ask your AI coach..." required />
+                            <button type="submit" class="btn" id="coachAskBtn">Ask</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="ai-card" style="margin-top:1rem;">
+                    <h3>Latest Training Plan</h3>
+                    <div style="margin-bottom:0.75rem;">
+                        <button class="btn" id="refreshPlanBtn">Refresh Training Plan</button>
+                    </div>
+                    <div class="plan-output" id="trainingPlanOutput">No plan loaded yet.</div>
+                </div>
             </div>
         </div>
     </div>
@@ -437,6 +542,13 @@
         const logoutBtn = document.getElementById('logoutBtn');
         const editForm = document.getElementById('editForm');
         const updateBtn = document.getElementById('updateBtn');
+        const docUploadForm = document.getElementById('docUploadForm');
+        const docUploadBtn = document.getElementById('docUploadBtn');
+        const coachQueryForm = document.getElementById('coachQueryForm');
+        const coachAskBtn = document.getElementById('coachAskBtn');
+        const coachChatLog = document.getElementById('coachChatLog');
+        const refreshPlanBtn = document.getElementById('refreshPlanBtn');
+        const trainingPlanOutput = document.getElementById('trainingPlanOutput');
 
         function showMessage(message, type) {
             messageDiv.innerHTML = `<div class="message ${type}">${message}</div>`;
@@ -469,6 +581,7 @@
                     socket.emit('join-athlete', athleteId);
                     // Also load the athlete info to display the name
                     loadAthleteInfo();
+                    loadTrainingPlan();
                 }
             } catch (error) {
                 console.error('Error getting athlete ID:', error);
@@ -620,6 +733,125 @@
                 setLoading(false);
             }
         });
+
+        function addChatBubble(role, text) {
+            const bubble = document.createElement('div');
+            bubble.className = `chat-bubble ${role}`;
+            bubble.textContent = text;
+            coachChatLog.appendChild(bubble);
+            coachChatLog.scrollTop = coachChatLog.scrollHeight;
+        }
+
+        docUploadForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const fileInput = document.getElementById('coachDocument');
+            const status = document.getElementById('docUploadStatus');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                status.textContent = 'Please select a document first.';
+                return;
+            }
+
+            docUploadBtn.disabled = true;
+            docUploadBtn.textContent = 'Uploading...';
+            status.textContent = 'Uploading and indexing document...';
+
+            try {
+                const formData = new FormData();
+                formData.append('document', file);
+                if (athleteId) {
+                    formData.append('athleteId', athleteId);
+                }
+
+                const response = await fetch('/ai/upload-document', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                if (result.success) {
+                    status.textContent = 'Document indexed successfully.';
+                    fileInput.value = '';
+                } else {
+                    status.textContent = result.message || 'Document upload failed.';
+                }
+            } catch (error) {
+                status.textContent = 'Error uploading document.';
+            } finally {
+                docUploadBtn.disabled = false;
+                docUploadBtn.textContent = 'Upload';
+            }
+        });
+
+        coachQueryForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const input = document.getElementById('coachQuestion');
+            const question = input.value.trim();
+            if (!question) return;
+
+            addChatBubble('user', question);
+            input.value = '';
+            coachAskBtn.disabled = true;
+            coachAskBtn.textContent = 'Thinking...';
+
+            try {
+                const response = await fetch('/ai/coach-query', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    addChatBubble('ai', result.data?.answer || 'No answer returned.');
+                } else {
+                    addChatBubble('ai', result.message || 'Could not process your question.');
+                }
+            } catch (error) {
+                addChatBubble('ai', 'AI coach is currently unavailable. Please try again.');
+            } finally {
+                coachAskBtn.disabled = false;
+                coachAskBtn.textContent = 'Ask';
+            }
+        });
+
+        function formatTrainingPlan(plan) {
+            if (!plan) return 'No training plan found yet. Upload a video and run AI analysis first.';
+
+            const exerciseLines = (plan.exercises || [])
+                .map((exercise, index) => {
+                    return `${index + 1}. ${exercise.name} (${exercise.focusArea || 'general'}) - ${exercise.frequencyPerWeek}x/week, ${exercise.durationMinutes} min`;
+                })
+                .join('\n');
+
+            return [
+                `Goal: ${plan.goal || '-'}`,
+                `Duration: ${plan.duration || '-'}`,
+                `Baseline Score: ${plan.baselineScore ?? '-'}`,
+                `Target Score: ${plan.targetScore ?? '-'}`,
+                `Reasoning: ${plan.reasoning || '-'}`,
+                '',
+                'Exercises:',
+                exerciseLines || 'No exercises found.'
+            ].join('\n');
+        }
+
+        async function loadTrainingPlan() {
+            if (!athleteId) return;
+            trainingPlanOutput.textContent = 'Loading training plan...';
+            try {
+                const response = await fetch(`/ai/training-plan/${athleteId}`);
+                const result = await response.json();
+                if (result.success) {
+                    trainingPlanOutput.textContent = formatTrainingPlan(result.data);
+                } else {
+                    trainingPlanOutput.textContent = result.message || 'No training plan found.';
+                }
+            } catch (error) {
+                trainingPlanOutput.textContent = 'Failed to load training plan.';
+            }
+        }
+
+        refreshPlanBtn.addEventListener('click', loadTrainingPlan);
 
         logoutBtn.addEventListener('click', async () => {
             try {
